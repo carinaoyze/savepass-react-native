@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { NavigationRouteContext, useNavigation } from '@react-navigation/native';
 import { Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -47,9 +47,22 @@ export function RegisterLoginData() {
       ...formData
     }
 
-    const dataKey = '@savepass:logins';
+      const dataKey = '@savepass:logins';
+      // Save data on AsyncStorage and navigate to 'Home' screen
+      const getData = await AsyncStorage.getItem(dataKey);
+      
+      const getDataFormatted = JSON.parse(getData) || [];
 
-    // Save data on AsyncStorage and navigate to 'Home' screen
+      const parsedData = [
+          ...getDataFormatted,
+          newLoginData
+      ];
+      
+      await AsyncStorage.setItem(dataKey, JSON.stringify(parsedData));
+      navigate('Home');
+      
+     
+    
   }
 
   return (
@@ -67,7 +80,7 @@ export function RegisterLoginData() {
             name="service_name"
             error={
               // Replace here with real content
-              'Has error ? show error message'
+              errors.service_name && errors.service_name.message
             }
             control={control}
             autoCapitalize="sentences"
@@ -79,7 +92,7 @@ export function RegisterLoginData() {
             name="email"
             error={
               // Replace here with real content
-              'Has error ? show error message'
+              errors.email && errors.email.message
             }
             control={control}
             autoCorrect={false}
@@ -92,7 +105,7 @@ export function RegisterLoginData() {
             name="password"
             error={
               // Replace here with real content
-              'Has error ? show error message'
+              errors.password && errors.password.message
             }
             control={control}
             secureTextEntry
